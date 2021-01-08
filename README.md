@@ -1,4 +1,4 @@
-# Workflow
+# Workflow :octocat:
  From Lab to Production Projects
 
 ## Setup
