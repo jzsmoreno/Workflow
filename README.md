@@ -8,7 +8,7 @@ To install the dependencies, you can simply follow this steps.
 Clone the project repository:
 ```bash
 git clone https://github.com/jzsmoreno/Workflow.git
-cd streamlit-example
+cd Workflow
 ```
 
 To create and activate the virtual environment, follow these steps:
