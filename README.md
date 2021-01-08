@@ -7,7 +7,7 @@ To install the dependencies, you can simply follow this steps.
 
 Clone the project repository:
 ```bash
-git clone https://github.com/RodolfoFerro/streamlit-example.git
+git clone https://github.com/jzsmoreno/Workflow.git
 cd streamlit-example
 ```
 
