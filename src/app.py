@@ -3,7 +3,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 
-
+# This files are in the src folder
 from iris import iris_classifier
 from figure import plotly_figure_1
 from figure import plotly_figure_2
