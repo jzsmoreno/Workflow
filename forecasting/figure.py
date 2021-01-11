@@ -18,4 +18,3 @@ def plot_displot(df_series, data_pred, i = 0):
     values = [i, -1]
     fig = px.histogram(df_series, y=df_series.iloc[:, values].columns, marginal="box")
     return fig
-
