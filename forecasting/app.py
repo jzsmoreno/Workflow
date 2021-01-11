@@ -9,6 +9,7 @@ from tensorflow.keras.models import load_model
 from series import forecasting, convert_to_df, create_train_test_set
 from figure import plot_series
 from figure import plot_time_series
+from figure import plot_displot
 
 np.random.seed(0)
 neural_network = load_model('forecasting/data_series.h5')
@@ -85,3 +86,12 @@ prediction = forecasting(model, train, data_.shape[1], values)
 
 fig2 = plot_series(convert_to_df(data_), prediction, i = i_serie)
 st.plotly_chart(fig2)
+
+st.write(
+    """
+    Ahora veamos la desviación de nuestra predicción: 
+    """
+)
+
+fig3 = plot_displot(convert_to_df(data_), prediction, i = i_serie)
+st.plotly_chart(fig3)
