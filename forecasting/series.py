@@ -17,13 +17,13 @@ def create_train_test_set(data_series, p_train = 0.7):
     
     train_ = int(data_series.shape[0])
     train_init = int(data_series.shape[1]*p_train)
-    x_train = data_series[:train_, :train_init]
-    y_train = data_series[:train_, -5:, 0]
+    x_train = data_series[:train_, :train_init-5]
+    y_train = data_series[:train_, train_init-5:train_init, 0]
     
     train = [x_train, y_train]
     
-    x_test = data_series[train_:, train_init:]
-    y_test = data_series[train_:, -5:, 0]
+    x_test = data_series[train_:, :train_init-5]
+    y_test = data_series[train_:, train_init-5:train_init, 0]
     
     test = [x_test, y_test]
     
