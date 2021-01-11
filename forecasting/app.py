@@ -34,7 +34,7 @@ st.write(
     """
 )
 n = st.slider(
-    "Número total de series", 1, 100, 25, 1
+    "Número total de series", 2, 200, 25, 1
 )
 
 i_serie = st.slider(
@@ -95,3 +95,10 @@ st.write(
 
 fig3 = plot_displot(convert_to_df(data_), prediction, i = i_serie)
 st.plotly_chart(fig3)
+
+st.write(
+    """
+    Exactitud: 
+    """
+)
+st.header(str(round(model.evaluate(train[0], train[1])[1]*100))+'%')
