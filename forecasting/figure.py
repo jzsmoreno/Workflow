@@ -12,7 +12,7 @@ def plot_time_series(df, i = 0):
     fig = px.line(df.iloc[:, i])
     return fig
 
-def displot(df_series, data_pred, i = 0):
+def plot_displot(df_series, data_pred, i = 0):
     df_series['prediction'] = data_pred[i, :, 0]
     # plotly figure
     values = [i, -1]
