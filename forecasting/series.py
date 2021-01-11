@@ -1,5 +1,4 @@
 from likelihood import generate_series, regression
-from likelihood import scale
 from tensorflow.keras.models import load_model
 import pandas as pd
 import numpy as np
@@ -86,14 +85,35 @@ def rescale(dataset, n=1):
         else:
             fitting.append(0.0)
         dataset[i, :, 0] += -poly
-        mu.append(np.mean(dataset[i, :, 0]))
-        if np.std(dataset[i, :, 0]) != 0: 
-            sigma.append(np.std(dataset[i, :, 0]))
+        mu.append(np.min(dataset[i, :, 0]))
+        if np.max(dataset[i, :, 0]) != 0: 
+            sigma.append(np.max(dataset[i, :, 0])-mu[i])
         else:
             sigma.append(1)
             
-        dataset[i, :, 0] = (dataset[i, :, 0] - mu[i]) / sigma[i]
+        dataset[i, :, 0] = 2*((dataset[i, :, 0] - mu[i]) / sigma[i])-1
          
     values = [mu, sigma, fitting]
     
     return dataset, values
+ 
+def scale(dataset, values):
+    """Performs the inverse operation to the rescale function
+    
+    Parameters
+    ----------
+    dataset : np.array
+        An array containing the scaled data.
+    values : np.ndarray
+        A set of values returned by the rescale function.
+    
+    """
+    
+    for i in range(dataset.shape[0]):
+        dataset[i, :, 0] += 1
+        dataset[i, :, 0] /= 2
+        dataset[i, :, 0] = dataset[i, :, 0]*values[1][i]
+        dataset[i, :, 0] += values[0][i]
+        dataset[i, :, 0] += values[2][i](range(dataset.shape[1]))
+    
+    return dataset
