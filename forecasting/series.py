@@ -16,7 +16,7 @@ def convert_to_df(data_series):
 def create_train_test_set(data_series, p_train = 0.7):
     n_steps = data_series.shape[1]
     
-    train_ = int(data_series.shape[0]*p_train)
+    train_ = int(data_series.shape[0])
     train_init = int(data_series.shape[1]*p_train)
     x_train = data_series[:train_, :train_init]
     y_train = data_series[:train_, -5:, 0]

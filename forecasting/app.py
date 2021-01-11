@@ -38,7 +38,7 @@ n = st.slider(
 )
 
 i_serie = st.slider(
-    "Serie a considerar", 0, n, 0, 1
+    "Serie a considerar", 0, n-1, 0, 1
 )
 p_train = st.slider(
     "Proporción", 0.25, 1.0, 0.75, 0.05
