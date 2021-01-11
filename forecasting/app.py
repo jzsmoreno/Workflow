@@ -11,7 +11,7 @@ from figure import plot_series
 from figure import plot_time_series
 
 np.random.seed(0)
-neural_network = load_model('data_series.h5')
+neural_network = load_model('forecasting/data_series.h5')
 
 models = {
     "Neural Network": neural_network
