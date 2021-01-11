@@ -49,3 +49,10 @@ Finally, if you want to run the main script:
 ```bash
 $ streamlit run src/app.py
 ```
+#### Other models
+
+If you want to use another model, for example the forecasting model, run the following command line:
+
+```bash
+$ streamlit run other-models/forecasting/app.py
+```
