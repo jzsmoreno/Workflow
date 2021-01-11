@@ -5,7 +5,7 @@ import numpy as np
 from likelihood import generate_series, rescale
 from tensorflow.keras.models import load_model
 
-# This files are in the src-forecasting folder
+# This files are in the forecasting folder
 from series import forecasting, convert_to_df, create_train_test_set
 from figure import plot_series
 from figure import plot_time_series
