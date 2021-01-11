@@ -41,7 +41,7 @@ i_serie = st.slider(
     "Serie a considerar", 0, n, 0, 1
 )
 p_train = st.slider(
-    "Proporción", 0.5, 1.0, 0.75, 0.05
+    "Proporción", 0.05, 1.0, 0.75, 0.05
 )
 
 # The dataset is generated
