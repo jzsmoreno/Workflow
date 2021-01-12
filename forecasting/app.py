@@ -23,29 +23,41 @@ st.title("Predicción de series temporales usando Redes Neuronales")
 st.write(
     """
     Bienvenid@ a este sencillo ejemplo que ejecuta un modelo entrenado 
-    de AI. 
+    de IA usando redes neuronales recurrentes para predecir series de tiempo. 
     """
+)
+
+# Selección del modelo
+model_selector = st.sidebar.selectbox(
+    "Selecciona el modelo a utilizar:",
+    list(models.keys())
 )
 
 # Especificación de datos
-st.write(
+st.sidebar.markdown(
     """
-    Especificamos las características:
+    # Especificamos las características:
     """
 )
-n = st.slider(
+
+# Or even better, call Streamlit functions inside a "with" block:
+
+val = st.sidebar.radio('Inclinación', (False, True))
+st.sidebar.write(f"You are in {val} slope value!")
+
+n = st.sidebar.slider(
     "Número total de series", 2, 200, 25, 1
 )
 
-i_serie = st.slider(
+i_serie = st.sidebar.slider(
     "Serie a considerar", 0, n-1, 0, 1
 )
 
-val = st.slider(
-    "Inclinación", 0, 1, 0, 1
-)
+#val = st.sidebar.slider(
+#    "Inclinación", 0, 1, 0, 1
+#)
 
-p_train = st.slider(
+p_train = st.sidebar.slider(
     "Proporción", 0.25, 1.0, 0.75, 0.05
 )
 
@@ -58,7 +70,7 @@ train, test = create_train_test_set(np.copy(data_scale), p_train = p_train)
 # Sección de datos
 st.write(
     """
-    A continuación los datos utilizados.
+    A continuación se muestran las estadísticas descriptivas de los datos utilizados:
     """
 )
 st.dataframe(series)
@@ -66,17 +78,12 @@ st.dataframe(series)
 # Sección de datos
 st.write(
     """
-    Y un pequeño gráfico generado con Plotly.
+    Y un pequeño gráfico generado con Plotly de una de las series temporales.
     """
 )
 fig1 = plot_time_series(convert_to_df(data_), i = i_serie)
 st.plotly_chart(fig1)
 
-# Selección del modelo
-model_selector = st.sidebar.selectbox(
-    "Selecciona el modelo a utilizar:",
-    list(models.keys())
-)
 model = models[model_selector]
 
 # Predicción
@@ -98,12 +105,22 @@ st.write(
     """
 )
 
+st.write(
+    """
+    El error cuadrático medio del modelo es: 
+    """
+)
+st.header(str(round(model.evaluate(train[0], train[1])[0], 4)))
+
+
 fig3 = plot_displot(convert_to_df(data_), prediction, i = i_serie)
 st.plotly_chart(fig3)
 
 st.write(
     """
-    Exactitud: 
+    La exactitud del modelo es: 
     """
 )
 st.header(str(round(model.evaluate(train[0], train[1])[1]*100))+'%')
+
+

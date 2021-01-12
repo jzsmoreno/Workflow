@@ -41,6 +41,7 @@ def forecasting(model, train, m, values):
     series_pred = scale(np.copy(data_pred), values)
     return(series_pred)
     
+    
 def rescale(dataset, n=1):
     """Perform a standard rescaling of the data
     
