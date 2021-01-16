@@ -1,28 +1,27 @@
 import pandas as pd
 from numba import jit
-import numpy as np 
-import math
+import numpy as np
 
 @jit(nopython=True)
 def centros(X,evalu,n_days):
     C=[]
-    aux=np.random.choice(X)
+    aux=np.random.choice(np.array(X))
     while(aux[1]!=1):
-        aux=np.random.choice(X)
+        aux=np.random.choice(np.array(X))
     C.append(int(aux[0]))
     dist=evalu[int(C[0]-1)]
-    aux=np.random.choice(dist)
-    while(aux<=np.mean(dist)*0.7):
-        aux=np.random.choice(dist)
+    aux=np.random.choice(np.array(dist))
+    while(aux<=np.mean(np.array(dist))*0.7):
+        aux=np.random.choice(np.array(dist))
     indx=dist.index(aux)
     C.append(int(X[indx][0]))
     for i in range(n_days-2):
         dist=np.array(dist)
         dist+=np.array(evalu[int(C[i+1]-1)])
         dist=list(dist)
-        aux=np.random.choice(dist)
-        while(aux<=np.mean(dist)*0.9):
-            aux=np.random.choice(dist)
+        aux=np.random.choice(np.array(dist))
+        while(aux<=np.mean(np.array(dist))*0.9):
+            aux=np.random.choice(np.array(dist))
         indx=dist.index(aux)
         C.append(int(X[indx][0]))    
     return C
