@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from numpy import loadtxt
-from numba import jit
 
 # This files are in the src folder
 from grasp import grasp
@@ -31,13 +30,13 @@ st.dataframe(data.head())
 # Especificación de datos
 st.sidebar.markdown(
     """
-    Especificamos los Dias de Entrega:
+    # Especificamos los Dias de Entrega:
     """
 )
 n_days = st.sidebar.slider(
-    "Número de Días de Entrega", 3.0, 4.0, 6.0, 1.0
+    "Número de Días de Entrega", 3, 6, 4, 1
 )
-asig=grasp(data,evalu,int(n_days))
+asig=grasp(data,evalu, n_days)
 # Sección de datos
 st.write(
     """

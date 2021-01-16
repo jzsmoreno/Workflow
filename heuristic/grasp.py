@@ -1,13 +1,14 @@
 import pandas as pd
-from numba import jit
+from numba import njit, prange, jit
 import numpy as np
+import random
 
-@jit(nopython=True)
+@jit()
 def centros(X,evalu,n_days):
     C=[]
-    aux=np.random.choice(np.array(X))
+    aux=random.choice(X)
     while(aux[1]!=1):
-        aux=np.random.choice(np.array(X))
+        aux=random.choice(X)
     C.append(int(aux[0]))
     dist=evalu[int(C[0]-1)]
     aux=np.random.choice(np.array(dist))
@@ -33,7 +34,7 @@ def clientes(C,X,asig,frec,data,evalu,n_days):
     climit=data.Frecuencia.sum()/n_days
     vmax=data.Frecuencia*data.Vol_Entrega
     vlim=vmax.sum()/n_days
-    for i in range(n_days):
+    for i in prange(n_days):
         dist=list(evalu[C[i]-1].copy())
         dist[C[i]-1]= c1
         asig[i][C[i]-1]=1
@@ -41,7 +42,7 @@ def clientes(C,X,asig,frec,data,evalu,n_days):
         maxv=X[C[i]-1][2]
         j=1
         f=[]
-        for k in range(len(frec)):
+        for k in prange(len(frec)):
             if(frec[k]>1):
                 f.append(dist[k])
         for k in range(len(f)):
@@ -85,9 +86,9 @@ def grasp(data,evalu,n_days):
     k=False
     while( k==False):
         asig=[]
-        for i in range(n_days):
+        for i in prange(n_days):
             ss=[]
-            for j in range(ntotal):
+            for j in prange(ntotal):
                 ss.append(0)
             asig.append(ss)
         frec=list(np.array(data.Frecuencia))
