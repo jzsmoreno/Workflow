@@ -8,8 +8,8 @@ from grasp import grasp
 from figure import plotly_figure_1
 
 
-data=pd.read_csv("../Emmanuel/ubicaciones.csv")
-evalu=loadtxt('../Emmanuel/evalu.csv', delimiter=',')
+data=pd.read_csv('heuristic/ubicaciones.csv')
+evalu=loadtxt('heuristic/evalu.csv', delimiter=',')
 evalu=evalu.tolist()
 
 
