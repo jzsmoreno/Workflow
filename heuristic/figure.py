@@ -19,5 +19,3 @@ def plotly_figure_1(data,asig):
     fig.update_layout(mapbox_style="open-street-map")
     fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
     return fig
-
-

@@ -7,7 +7,6 @@ from numpy import loadtxt
 from grasp import grasp
 from figure import plotly_figure_1
 
-
 data=pd.read_csv('heuristic/ubicaciones.csv')
 evalu=loadtxt('heuristic/evalu.csv', delimiter=',')
 evalu=evalu.tolist()
@@ -17,7 +16,7 @@ evalu=evalu.tolist()
 st.title("Optimización de Territorios Usando Heurística GRASP")
 st.write(
     """
-    Bienvenid@ a este ejemplo que ejecuta un modelo Grasp directo en Streamlit. 
+    Bienvenid@ a este ejemplo que ejecuta un modelo Grasp. 
     """
 )
 
@@ -29,12 +28,12 @@ st.write(
 )
 st.dataframe(data.head())
 # Especificación de datos
-st.write(
+st.sidebar.markdown(
     """
     Especificamos los Dias de Entrega:
     """
 )
-n_days = st.slider(
+n_days = st.sidebar.slider(
     "Número de Días de Entrega", 3.0, 4.0, 6.0, 1.0
 )
 asig=grasp(data,evalu,int(n_days))
