@@ -97,5 +97,5 @@ st.dataframe(Possiblefrauds)
 # Obtengo la precición del modelo
 acc = getAccuracy(dataset,fraud_id)
 
-st.write("* Porcentaje de prediccion : ")
-st.header(str(acc))
+st.write("* Porcentaje de predicción : ")
+st.header(str(round(acc, 2))+'%')
