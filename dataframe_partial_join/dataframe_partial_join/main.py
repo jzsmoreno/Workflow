@@ -44,6 +44,22 @@ def clearConsole():
 
 # auxiliary function to rename columns after each match 
 def rename_cols(df):
+    '''
+    Operates on a dataframe resulting from a join.
+    Identifying the cases in which there was a renaming of similar columns
+    with different information, consolidating them.
+
+    params:
+        df (Dataframe) : The dataframe on which you want to operate
+
+    returns:
+        df (Dataframe) : The same df dataframe with the consolidated columns
+
+    example:
+        df_1 = df_1.merge(df_2, how = 'left')
+        df_1 = rename_cols(df_1)
+        >>
+    '''
     cols = []
     for i in df.columns:
         cols.append(i.replace('_x', ''))
