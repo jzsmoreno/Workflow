@@ -1,15 +1,15 @@
-import streamlit as st
-import pandas as pd
 import numpy as np
-from numpy import loadtxt
+import pandas as pd
+import streamlit as st
+from figure import plotly_figure_1
 
 # This files are in the src folder
 from grasp import grasp
-from figure import plotly_figure_1
+from numpy import loadtxt
 
-data=pd.read_csv('heuristic/ubicaciones.csv')
-evalu=loadtxt('heuristic/evalu.txt')
-evalu=evalu.tolist()
+data = pd.read_csv("heuristic/ubicaciones.csv")
+evalu = loadtxt("heuristic/evalu.txt")
+evalu = evalu.tolist()
 
 
 # Sección de introducción
@@ -33,15 +33,13 @@ st.sidebar.markdown(
     # Especificamos los Dias de Entrega:
     """
 )
-n_days = st.sidebar.slider(
-    "Número de Días de Entrega", 3, 6, 4, 1
-)
-asig=grasp(data,evalu, n_days)
+n_days = st.sidebar.slider("Número de Días de Entrega", 3, 6, 4, 1)
+asig = grasp(data, evalu, n_days)
 # Sección de datos
 st.write(
     """
     Veamos los clusters de clientes divididos por Día de Entrega.
     """
 )
-fig = plotly_figure_1(data,asig)
+fig = plotly_figure_1(data, asig)
 st.plotly_chart(fig)

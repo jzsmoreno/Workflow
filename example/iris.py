@@ -1,5 +1,5 @@
-from sklearn.datasets import load_iris
 from sklearn import tree
+from sklearn.datasets import load_iris
 
 
 def iris_classifier(verbose=False):
@@ -16,11 +16,15 @@ def iris_classifier(verbose=False):
 
     # Visualize model:
     if verbose:
-        dot_data = tree.export_graphviz(clf, out_file=None,
-                                        feature_names=iris.feature_names,
-                                        class_names=iris.target_names,
-                                        filled=True, rounded=True,
-                                        special_characters=True)
+        dot_data = tree.export_graphviz(
+            clf,
+            out_file=None,
+            feature_names=iris.feature_names,
+            class_names=iris.target_names,
+            filled=True,
+            rounded=True,
+            special_characters=True,
+        )
         graph = graphviz.Source(dot_data)
         graph.render("iris")
 

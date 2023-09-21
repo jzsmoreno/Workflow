@@ -2,8 +2,9 @@ pandas
 plotly
 streamlit
 matplotlib
-scipy==1.4.1
+scipy
 scikit-learn
 likelihood
 tensorflow
+numpy
 numba
