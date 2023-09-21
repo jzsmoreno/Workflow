@@ -12,12 +12,12 @@ class Helsinki:
     def __init__(self):
         pass
 
-    def translate_text(text, target="en"):
+    def translate_text(self, text, target="en"):
         translator = GoogleTranslator(source="auto", target=target)
         translation = translator.translate(text)
         return translation
 
-    def translate_batch(texts):
+    def translate_batch(self, texts):
         translated = MyMemoryTranslator("es", "en").translate_batch(texts)
         return translated
 
