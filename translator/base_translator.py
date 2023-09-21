@@ -1,3 +1,5 @@
+from typing import List
+
 from deep_translator import GoogleTranslator, MyMemoryTranslator
 from pandas.core.frame import DataFrame
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
@@ -12,12 +14,12 @@ class Helsinki:
     def __init__(self):
         pass
 
-    def translate_text(self, text, target="en"):
+    def translate_text(self, text: str, target: str = "en") -> str:
         translator = GoogleTranslator(source="auto", target=target)
         translation = translator.translate(text)
         return translation
 
-    def translate_batch(self, texts):
+    def translate_batch(self, texts: List[str]) -> List[str]:
         translated = MyMemoryTranslator("es", "en").translate_batch(texts)
         return translated
 
@@ -33,7 +35,7 @@ class Helsinki:
                     num_char = int(keys_[0])
                     break
                 except:
-                    values_ = [self._translate_text(j) for j in keys_]
+                    values_ = [self._translate_text_ai(j) for j in keys_]
                     dict_ = dict(zip(keys_, values_))
 
                     def translate_columns(x):
@@ -45,7 +47,7 @@ class Helsinki:
                     data[i] = data[i].apply(translate_columns)
         return data
 
-    def _translate_text(self, text: str) -> str:
+    def _translate_text_ai(self, text: str) -> str:
         batch = tokenizer([text], return_tensors="pt")
         generated_ids = model.generate(**batch)
         return tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
