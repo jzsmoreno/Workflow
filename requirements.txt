@@ -4,7 +4,12 @@ streamlit
 matplotlib
 scipy
 scikit-learn
+deep-translator
+transformers
 likelihood
 tensorflow
+torch
+torchaudio
+torchvision
 numpy
 numba
