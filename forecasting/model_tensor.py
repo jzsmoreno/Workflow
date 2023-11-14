@@ -75,7 +75,8 @@ if __name__ == "__main__":
 
     input = generate_series(num_series, series_size, incline=False)
     y_new = input[:, :-n_steps]
-    y_new, values = rescale(y_new)
+    scaler = DataScaler(y_new)
+    y_new = scaler.rescale()
     size_ = int(0.8 * y_new.shape[0])
     x_train = y_new[:size_, :-4]
     y_train = y_new[:size_, -4:]
@@ -107,7 +108,7 @@ if __name__ == "__main__":
 
     X = make_predictions(model, x_train[:, :, np.newaxis], n_steps=n_steps)
     print(X.shape)
-    X = scale(X, values)
+    X = scaler.scale(X)
 
     plt.plot(range(len(input[0, :])), input[0, :], "o-", label="real value")
     plt.plot(range(len(X[0, :]))[-n_steps * 4 :], X[0, :][-n_steps * 4 :], "-r", label="prediction")
