@@ -31,7 +31,7 @@ In practical terms, Gradient Boosting is a robust ensemble machine learning algo
 
 Suppose you want to train an algorithm in order to adjust a set of points, as shown in the image below.
 
-- The first step would be to have a baseline estimate using an decision tree, which is the case in the image, but for explanatory purposes, we will use the mean. So our first approach would be, $\hat{y}_{1}^{(0)} = \text{mean}(y_{1})$.
+- The first step would be to have a baseline estimate using an decision tree, which is the case in the image, but for explanatory purposes, we will use the mean. So our first approach would be, $\hat{y_{1}}^{(0)} = \text{mean}(y_{1})$.
 
 for $f(\mathbf{x}) = y_{1}$
 
@@ -51,15 +51,15 @@ Therefore, the improvement $i$, due to the decision tree $D^{(i)}(\mathbf{x})$ w
 
 $$
 \begin{equation}
-\hat{y}^{(i)}_{1} = \hat{y}^{(i)}_{1} - \alpha \cdot D^{(i)}(\mathbf{x})
+\hat{y_{1}}^{(i+1)} = \hat{y_{1}}^{(i)} + \alpha \cdot D^{(i)}(\mathbf{x})
 \end{equation}
 $$
 
-where the prediction of the decision tree $D^{(i)}(\mathbf{x})$ models the residue $r_{(i)}(\mathbf{x})$, for $i$ equal to 1 up to $N$. Where the residues are:
+where the prediction of the decision tree $D^{(i)}(\mathbf{x})$ models the residue $r_{(i)}(\mathbf{x})$, for $i$ equal to 0 up to $N$. Where the residues are:
 
 $$
 \begin{equation}
-r_{(i)}(\mathbf{x}) = r_{(i-1)}(\mathbf{x}) - \hat{r}_{(i-1)}(\mathbf{x})
+r_{(i)}(\mathbf{x}) = y_{1} - \hat{y}_{1}^{(i)}
 \end{equation}
 $$
 
