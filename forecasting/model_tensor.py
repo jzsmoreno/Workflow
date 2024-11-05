@@ -1,3 +1,8 @@
+import os
+
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
+os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -58,8 +63,8 @@ class PrintDot(tf.keras.callbacks.Callback):
         print(".", end="")
 
 
-def make_predictions(model, input, n_steps):
-    X = input.copy()
+def make_predictions(model, input_model, n_steps):
+    X = input_model.copy()
     for step_ahead in range(n_steps):
         y_pred_one = model.predict(X[:, step_ahead:])
         y_pred_one = y_pred_one[:, :, np.newaxis]
@@ -69,12 +74,13 @@ def make_predictions(model, input, n_steps):
 
 
 if __name__ == "__main__":
-    num_series = 500
+    num_series = 80
     series_size = 100
     n_steps = 5
 
-    input = generate_series(num_series, series_size, incline=False)
-    y_new = input[:, :-n_steps]
+    input_serie = generate_series(num_series, series_size, incline=False)
+    y_new = input_serie[:, :-n_steps]
+    print(y_new.shape)
     scaler = DataScaler(y_new)
     y_new = scaler.rescale()
     size_ = int(0.8 * y_new.shape[0])
@@ -92,7 +98,7 @@ if __name__ == "__main__":
     # model(x_train[:, :, np.newaxis])
     model.compile(loss="mse", optimizer="sgd", metrics=["mae"])
     history = model.fit(
-        x_train[:, :, np.newaxis], y_train, epochs=30, validation_split=0.2, callbacks=[PrintDot()]
+        x_train[:, :, np.newaxis], y_train, epochs=100, validation_split=0.2, callbacks=[PrintDot()]
     )
 
     hist = pd.DataFrame(history.history)
@@ -110,7 +116,7 @@ if __name__ == "__main__":
     print(X.shape)
     X = scaler.scale(X)
 
-    plt.plot(range(len(input[0, :])), input[0, :], "o-", label="real value")
+    plt.plot(range(len(input_serie[0, :])), input_serie[0, :], "o-", label="real value")
     plt.plot(range(len(X[0, :]))[-n_steps * 4 :], X[0, :][-n_steps * 4 :], "-r", label="prediction")
     plt.xlabel("Time")
     plt.ylabel("Value")

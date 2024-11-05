@@ -1,12 +1,13 @@
 import numpy as np
 import pandas as pd
 import streamlit as st
-from figure import *
 from likelihood.tools import *
+from tensorflow.keras.models import load_model
+
+from figure import *
 
 # This files are in the forecasting folder
 from series import *
-from tensorflow.keras.models import load_model
 
 np.random.seed(0)
 neural_network = load_model("forecasting/models/model_tensor.h5")
@@ -50,7 +51,8 @@ p_train = st.sidebar.slider("Proporción", 0.2, 1.0, 0.7, 0.1)
 
 # The dataset is generated
 data_ = generate_series(n, n_steps=100, incline=val)
-data_scale, values = rescale(np.copy(data_))
+scaler = DataScaler(np.copy(data_))
+data_scale = scaler.rescale()
 series = convert_to_df(np.copy(data_)).describe()
 train, test = create_train_test_set(np.copy(data_scale), p_train=p_train)
 neural_network.fit(train[0], train[1])
@@ -82,7 +84,7 @@ st.write(
     """
 )
 
-prediction = forecasting(model, train, data_.shape[1], values)
+prediction = forecasting(model, train, data_.shape[1], scaler)
 
 fig2 = plot_series(convert_to_df(data_), prediction, i=i_serie)
 st.plotly_chart(fig2)
