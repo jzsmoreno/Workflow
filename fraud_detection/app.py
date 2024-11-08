@@ -1,20 +1,20 @@
 import streamlit as st
 from pylab import bone, colorbar, pcolor, plot, show
-from Soms_FraudDetection import getAccuracy, getData, getFrauds, somTrained, transformData
+from Soms_FraudDetection import getData, getFrauds, getMetrics, load_model, transformData
 
 # Importacion del conjunto de datos
 dataset, features, isFraud = getData()
 # Preprocesamiento de los datos
 features, sc = transformData(features)
 
-models = {"Self-organizing map": somTrained(features)}
+models = {"Self-Organizing Map": load_model("./fraud_detection/som.p")}
 
 # Sección de introducción
-st.title("Predicción de fraudes usando mapas autoorganizados")
+st.title("Predicción de fraudes usando mapas auto-organizados")
 st.write(
     """
     * Bienvenid@ a este sencillo ejemplo que ejecuta un modelo entrenado 
-    de IA usando mapas autoorganizados para encontrar potenciales fraudes.
+    de IA usando mapas auto-organizados para encontrar potenciales fraudes.
 
     * La base de datos utilizada proviene del siguiente link: https://archive.ics.uci.edu/ml/datasets/credit+approval
     """
@@ -53,7 +53,7 @@ st.write(
 )
 
 # Obtenemos la gráfica de colores
-som = models["Self-organizing map"]
+som = models["Self-Organizing Map"]
 bone()
 pcolor(som.distance_map().T)
 colorbar()
@@ -88,7 +88,7 @@ st.dataframe(Possiblefrauds)
 
 
 # Obtengo la precición del modelo
-acc = getAccuracy(dataset, fraud_id)
+acc = getMetrics(dataset, fraud_id)
 
 st.write("* Porcentaje de predicción : ")
 st.header(str(round(acc, 2)) + "%")

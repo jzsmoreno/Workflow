@@ -1,13 +1,12 @@
 import numpy as np
 import pandas as pd
 import streamlit as st
-from likelihood.tools import *
-from tensorflow.keras.models import load_model
-
 from figure import *
+from likelihood.tools import *
 
 # This files are in the forecasting folder
 from series import *
+from tensorflow.keras.models import load_model
 
 np.random.seed(0)
 neural_network = load_model("forecasting/models/model_tensor.h5")
