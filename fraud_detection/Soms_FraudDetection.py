@@ -248,7 +248,7 @@ def getBestModel(
 
         except:
             print("error in getFrauds")
-            break
+            continue
 
     return best_model, mean_performance, best_parameters
 
