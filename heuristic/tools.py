@@ -1,6 +1,7 @@
 import glob
 import os
 
+
 def recombine_and_split(pattern):
     # Usar glob para encontrar todos los archivos que coincidan con el patrón
     part_files = glob.glob(pattern)
@@ -18,7 +19,7 @@ def recombine_and_split(pattern):
                 line = line.strip()  # Eliminar espacios en blanco y saltos de línea
 
                 split_line = line.split("\t")  # Dividir la línea por tabuladores
-                
+
                 # Convertir cada valor a un número flotante si es posible
                 try:
                     split_line = [float(x) for x in split_line]  # Intentar convertir a float
@@ -26,11 +27,14 @@ def recombine_and_split(pattern):
                     # Si ocurre un error en la conversión, se puede optar por dejar el valor original
                     # o manejarlos de alguna manera especial (como poner un valor por defecto).
                     print(f"Advertencia: Línea no convertible a flotantes: {line}")
-                    split_line = [None if x == '' else x for x in split_line]  # O manejarlo como None
+                    split_line = [
+                        None if x == "" else x for x in split_line
+                    ]  # O manejarlo como None
 
                 combined_split_lines.append(split_line)
 
     return combined_split_lines
+
 
 def split_file(input_file, chunk_size):
     with open(input_file, "r") as f:
