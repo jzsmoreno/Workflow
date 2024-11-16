@@ -64,7 +64,7 @@ def clientes(
     vlim = vmax.sum() / n_days
 
     for i in prange(n_days):
-        dist = list(evalu[C[i] - 1].copy())
+        dist = evalu[C[i] - 1].copy()
         dist[C[i] - 1] = c1
         asig[i][C[i] - 1] = 1
         frec[C[i] - 1] -= 1
@@ -73,14 +73,18 @@ def clientes(
         j = 1
         f = []
 
+        # Mejorar la búsqueda de clientes a asignar
         for k in prange(len(frec)):
             if frec[k] > 1:
                 f.append(dist[k])
 
+        # Asignar clientes de forma eficiente
         for k in range(len(f)):
             aux = min(f)
             ind = f.index(aux)
             indx = dist.index(aux)
+
+            # Aseguramos que el cliente no sea asignado previamente
             while frec[indx] < 1:
                 dist[indx] = c2
                 f[ind] = c2
@@ -95,6 +99,7 @@ def clientes(
             maxv += X[indx][2]
             j += 1
 
+        # Verificación de los límites de volumen y número de clientes
         while sum(frec) >= 1:
             aux = min(dist)
             indx = dist.index(aux)
@@ -109,7 +114,7 @@ def clientes(
             maxv += X[indx][2]
             j += 1
 
-            # Controlar el volumen total y número de clientes
+            # Control de volumen y clientes
             if maxv >= vlim * volume_limit_factor:
                 break
             if j >= climit * client_limit_factor:
