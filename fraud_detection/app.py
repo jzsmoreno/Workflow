@@ -1,5 +1,5 @@
-import streamlit as st
 import matplotlib.pyplot as plt
+import streamlit as st
 from pylab import bone, colorbar, pcolor, plot
 from Soms_FraudDetection import getData, getFrauds, getMetrics, load_model, transformData
 
