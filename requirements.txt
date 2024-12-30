@@ -7,7 +7,7 @@ scikit-learn
 deep-translator
 transformers
 likelihood
-tensorflow
+tensorflow==2.15.0
 torch
 torchaudio
 torchvision
