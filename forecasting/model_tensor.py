@@ -124,5 +124,5 @@ if __name__ == "__main__":
     plt.show()
 
     # savel model
-    # model.save("./models/model_tensor.h5")
-    model.network.save("./models/model_tensor.h5")
+    # model.save("./models/model_tensor", save_format="tf")
+    model.network.save("./models/model_tensor", save_format="tf")
