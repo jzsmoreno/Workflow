@@ -143,3 +143,4 @@ cython_debug/
 heuristic/evalu.txt
 
 *ml-1m*
+*.data
