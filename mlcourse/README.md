@@ -43,6 +43,9 @@ Welcome to the repository for the Machine Learning course! This repository conta
 13. [**A1-Boosting_Algorithms**](./src/A1_Boosting_Algorithms.ipynb)
     - Advanced boosting algorithms and their implementation.
 
+14. [**A2-Gaussian_Mixture**](./src/A2_Gaussian_Mixture.ipynb)
+    - Clustering and classification problems with bell-shaped curves.
+
 ## Getting Started
 
 To run these notebooks locally, you need to have Python and Jupyter Notebook installed. Follow these steps to get started:
