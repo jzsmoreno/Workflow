@@ -11,16 +11,17 @@ from likelihood.tools import *
 
 
 class SimpleNetRNN(tf.keras.models.Model):
-    def __init__(self, n_neurons):
+    def __init__(self, n_neurons, output_units):
         super(SimpleNetRNN, self).__init__()
         self.n_neurons = n_neurons
+        self.output_units = output_units
         self.network = tf.keras.Sequential(
             [
                 tf.keras.layers.SimpleRNN(
                     self.n_neurons, return_sequences=True, input_shape=[None, 1]
                 ),
                 tf.keras.layers.SimpleRNN(self.n_neurons),
-                tf.keras.layers.Dense(4, activation="tanh"),
+                tf.keras.layers.Dense(self.output_units, activation="tanh"),
             ]
         )
 
@@ -30,12 +31,13 @@ class SimpleNetRNN(tf.keras.models.Model):
 
 
 class SimpleNetGRU(tf.keras.models.Model):
-    def __init__(self, filters, kernel_size, n_units, strides):
+    def __init__(self, filters, kernel_size, n_units, strides, output_units):
         super(SimpleNetGRU, self).__init__()
         self.filters = filters
         self.kernel_size = kernel_size
         self.n_units = n_units
         self.strides = strides
+        self.output_units = output_units
         self.network = tf.keras.Sequential(
             [
                 tf.keras.layers.Conv1D(
@@ -47,7 +49,7 @@ class SimpleNetGRU(tf.keras.models.Model):
                 ),
                 tf.keras.layers.GRU(self.n_units, return_sequences=True),
                 tf.keras.layers.GRU(self.n_units),
-                tf.keras.layers.Dense(1, activation="linear"),
+                tf.keras.layers.Dense(self.output_units, activation="linear"),
             ]
         )
 
@@ -76,7 +78,7 @@ def make_predictions(model, input_model, n_steps):
 if __name__ == "__main__":
     num_series = 80
     series_size = 100
-    n_steps = 5
+    n_steps = 4  # For SimpleNetRNN use 4
 
     input_serie = generate_series(num_series, series_size, incline=False)
     y_new = input_serie[:, :-n_steps]
@@ -84,21 +86,21 @@ if __name__ == "__main__":
     scaler = DataScaler(y_new)
     y_new = scaler.rescale()
     size_ = int(0.8 * y_new.shape[0])
-    x_train = y_new[:size_, :-4]
-    y_train = y_new[:size_, -4:]
-    x_test = y_new[size_:, :-4]
-    y_test = y_new[size_:, -4:]
+    x_train = y_new[:size_, :-n_steps]
+    y_train = y_new[:size_, -n_steps:]
+    x_test = y_new[size_:, :-n_steps]
+    y_test = y_new[size_:, -n_steps:]
 
     print(x_train.shape, y_train.shape)
 
-    # optimizer = tf.keras.optimizers.Adam(learning_rate = 0.01)
-    optimizer = tf.keras.optimizers.SGD(learning_rate=0.01)
-    model = SimpleNetRNN(n_neurons=10)
-    # model = SimpleNetGRU(filters = 10, kernel_size = 4, n_units = 5, strides = 2)
+    optimizer = tf.keras.optimizers.Adam(learning_rate=0.01)
+    # optimizer = tf.keras.optimizers.SGD(learning_rate=0.01)
+    # model = SimpleNetRNN(n_neurons=10, output_units=n_steps)
+    model = SimpleNetGRU(filters=10, kernel_size=4, n_units=5, strides=2, output_units=n_steps)
     # model(x_train[:, :, np.newaxis])
-    model.compile(loss="mse", optimizer="sgd", metrics=["mae"])
+    model.compile(loss="mse", optimizer=optimizer, metrics=["mae"])
     history = model.fit(
-        x_train[:, :, np.newaxis], y_train, epochs=100, validation_split=0.2, callbacks=[PrintDot()]
+        x_train[:, :, np.newaxis], y_train, epochs=200, validation_split=0.2, callbacks=[PrintDot()]
     )
 
     hist = pd.DataFrame(history.history)
@@ -111,13 +113,18 @@ if __name__ == "__main__":
     plt.xlabel("Epoch")
     plt.ylabel("Loss")
     plt.show()
-
-    X = make_predictions(model, x_train[:, :, np.newaxis], n_steps=n_steps)
+    n_pred = 8
+    X = make_predictions(model, x_train[:, :, np.newaxis], n_steps=n_pred)
     print(X.shape)
     X = scaler.scale(X)
 
     plt.plot(range(len(input_serie[0, :])), input_serie[0, :], "o-", label="real value")
-    plt.plot(range(len(X[0, :]))[-n_steps * 4 :], X[0, :][-n_steps * 4 :], "-r", label="prediction")
+    plt.plot(
+        range(len(X[0, :]))[-n_steps * n_pred :],
+        X[0, :][-n_steps * n_pred :],
+        "-r",
+        label="prediction",
+    )
     plt.xlabel("Time")
     plt.ylabel("Value")
     plt.legend()
