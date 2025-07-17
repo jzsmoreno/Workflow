@@ -131,7 +131,7 @@ if __name__ == "__main__":
     input_serie = generate_series(num_series, series_size, incline=False)
     y_new = input_serie[:, :-n_steps]
     print(y_new.shape)
-    scaler = DataScaler(y_new, n = None)
+    scaler = DataScaler(y_new, n=None)
     y_new = scaler.rescale()
     size_ = int(0.8 * y_new.shape[0])
     x_train = y_new[:size_, :-n_steps]
