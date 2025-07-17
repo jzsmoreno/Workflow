@@ -30,32 +30,80 @@ class SimpleNetRNN(tf.keras.models.Model):
         return x
 
 
-class SimpleNetGRU(tf.keras.models.Model):
-    def __init__(self, filters, kernel_size, n_units, strides, output_units):
-        super(SimpleNetGRU, self).__init__()
-        self.filters = filters
-        self.kernel_size = kernel_size
-        self.n_units = n_units
-        self.strides = strides
-        self.output_units = output_units
-        self.network = tf.keras.Sequential(
-            [
-                tf.keras.layers.Conv1D(
-                    filters=self.filters,
-                    kernel_size=self.kernel_size,
-                    strides=self.strides,
-                    padding="valid",
-                    input_shape=[None, 1],
-                ),
-                tf.keras.layers.GRU(self.n_units, return_sequences=True),
-                tf.keras.layers.GRU(self.n_units),
-                tf.keras.layers.Dense(self.output_units, activation="linear"),
-            ]
+class SimpleNetGRU(tf.keras.Model):
+    def __init__(
+        self,
+        filters=64,
+        kernel_size=3,
+        n_units=128,
+        strides=1,
+        output_units=1,
+        dropout_rate=0.3,
+        recurrent_dropout_rate=0.3,
+        l2_reg=1e-4,
+        bidirectional=True,
+        output_activation="linear",
+        use_layer_norm=False,
+    ):
+        super().__init__()
+
+        kernel_regularizer = tf.keras.regularizers.l2(l2_reg)
+
+        # Convolutional layer + normalization + activation
+        self.conv = tf.keras.layers.Conv1D(
+            filters=filters,
+            kernel_size=kernel_size,
+            strides=strides,
+            padding="same",
+            kernel_initializer="he_normal",
+            kernel_regularizer=kernel_regularizer,
+        )
+        self.batch_norm = tf.keras.layers.BatchNormalization()
+        self.activation = tf.keras.layers.Activation("relu")
+        self.conv_dropout = tf.keras.layers.Dropout(dropout_rate)
+
+        # Layer GRU 1
+        gru1 = tf.keras.layers.GRU(
+            n_units,
+            return_sequences=True,
+            dropout=dropout_rate,
+            recurrent_dropout=recurrent_dropout_rate,
+            kernel_regularizer=kernel_regularizer,
+        )
+        self.gru_1 = tf.keras.layers.Bidirectional(gru1) if bidirectional else gru1
+
+        # Layer GRU 2
+        gru2 = tf.keras.layers.GRU(
+            n_units,
+            return_sequences=False,
+            dropout=dropout_rate,
+            recurrent_dropout=recurrent_dropout_rate,
+            kernel_regularizer=kernel_regularizer,
+        )
+        self.gru_2 = tf.keras.layers.Bidirectional(gru2) if bidirectional else gru2
+
+        # Optional normalization after GRU
+        self.rnn_norm = tf.keras.layers.LayerNormalization() if use_layer_norm else tf.identity
+
+        # Final dense layer
+        self.dense = tf.keras.layers.Dense(
+            output_units,
+            activation=output_activation,
+            kernel_regularizer=kernel_regularizer,
         )
 
-    def call(self, x):
-        x = self.network(x)
-        return x
+    def call(self, inputs, training=False):
+        x = self.conv(inputs)
+        x = self.batch_norm(x, training=training)
+        x = self.activation(x)
+        x = self.conv_dropout(x, training=training)
+
+        x = self.gru_1(x, training=training)
+        x = self.gru_2(x, training=training)
+        x = self.rnn_norm(x)
+
+        output = self.dense(x)
+        return output
 
 
 class PrintDot(tf.keras.callbacks.Callback):
@@ -68,7 +116,7 @@ class PrintDot(tf.keras.callbacks.Callback):
 def make_predictions(model, input_model, n_steps):
     X = input_model.copy()
     for step_ahead in range(n_steps):
-        y_pred_one = model.predict(X[:, step_ahead:])
+        y_pred_one = model.predict(X[:, step_ahead:], verbose=0)
         y_pred_one = y_pred_one[:, :, np.newaxis]
         X = np.concatenate((X, y_pred_one), axis=1)
 
@@ -83,7 +131,7 @@ if __name__ == "__main__":
     input_serie = generate_series(num_series, series_size, incline=False)
     y_new = input_serie[:, :-n_steps]
     print(y_new.shape)
-    scaler = DataScaler(y_new)
+    scaler = DataScaler(y_new, n = None)
     y_new = scaler.rescale()
     size_ = int(0.8 * y_new.shape[0])
     x_train = y_new[:size_, :-n_steps]
@@ -98,9 +146,20 @@ if __name__ == "__main__":
     # model = SimpleNetRNN(n_neurons=10, output_units=n_steps)
     model = SimpleNetGRU(filters=10, kernel_size=4, n_units=5, strides=2, output_units=n_steps)
     # model(x_train[:, :, np.newaxis])
+    early_stopping = tf.keras.callbacks.EarlyStopping(
+        monitor="val_loss", patience=10, restore_best_weights=True
+    )
+
+    reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(
+        monitor="val_loss", factor=0.5, patience=5, min_lr=1e-6
+    )
     model.compile(loss="mse", optimizer=optimizer, metrics=["mae"])
     history = model.fit(
-        x_train[:, :, np.newaxis], y_train, epochs=200, validation_split=0.2, callbacks=[PrintDot()]
+        x_train[:, :, np.newaxis],
+        y_train,
+        epochs=100,
+        validation_split=0.2,
+        callbacks=[PrintDot(), early_stopping, reduce_lr],
     )
 
     hist = pd.DataFrame(history.history)
@@ -113,7 +172,7 @@ if __name__ == "__main__":
     plt.xlabel("Epoch")
     plt.ylabel("Loss")
     plt.show()
-    n_pred = 8
+    n_pred = 16
     X = make_predictions(model, x_train[:, :, np.newaxis], n_steps=n_pred)
     print(X.shape)
     X = scaler.scale(X)
@@ -131,5 +190,4 @@ if __name__ == "__main__":
     plt.show()
 
     # savel model
-    # model.save("./models/model_tensor", save_format="tf")
-    model.network.save("./models/model_tensor", save_format="tf")
+    model.save("./models/model_tensor", save_format="tf")
