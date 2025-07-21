@@ -44,12 +44,13 @@ class SimpleNetGRU(tf.keras.Model):
         bidirectional=True,
         output_activation="linear",
         use_layer_norm=False,
+        num_heads=4,  # NEW: for multi-head attention
     ):
         super().__init__()
 
         kernel_regularizer = tf.keras.regularizers.l2(l2_reg)
 
-        # Convolutional layer + normalization + activation
+        # Convolutional block
         self.conv = tf.keras.layers.Conv1D(
             filters=filters,
             kernel_size=kernel_size,
@@ -62,7 +63,7 @@ class SimpleNetGRU(tf.keras.Model):
         self.activation = tf.keras.layers.Activation("relu")
         self.conv_dropout = tf.keras.layers.Dropout(dropout_rate)
 
-        # Layer GRU 1
+        # GRU layer 1
         gru1 = tf.keras.layers.GRU(
             n_units,
             return_sequences=True,
@@ -72,7 +73,14 @@ class SimpleNetGRU(tf.keras.Model):
         )
         self.gru_1 = tf.keras.layers.Bidirectional(gru1) if bidirectional else gru1
 
-        # Layer GRU 2
+        # Multi-head attention
+        self.attention = tf.keras.layers.MultiHeadAttention(
+            num_heads=num_heads,
+            key_dim=n_units,
+            dropout=dropout_rate,
+        )
+
+        # GRU layer 2
         gru2 = tf.keras.layers.GRU(
             n_units,
             return_sequences=False,
@@ -82,10 +90,8 @@ class SimpleNetGRU(tf.keras.Model):
         )
         self.gru_2 = tf.keras.layers.Bidirectional(gru2) if bidirectional else gru2
 
-        # Optional normalization after GRU
         self.rnn_norm = tf.keras.layers.LayerNormalization() if use_layer_norm else tf.identity
 
-        # Final dense layer
         self.dense = tf.keras.layers.Dense(
             output_units,
             activation=output_activation,
@@ -98,12 +104,22 @@ class SimpleNetGRU(tf.keras.Model):
         x = self.activation(x)
         x = self.conv_dropout(x, training=training)
 
-        x = self.gru_1(x, training=training)
-        x = self.gru_2(x, training=training)
-        x = self.rnn_norm(x)
+        # GRU 1
+        x = self.gru_1(x, training=training)  # (batch, time, features)
 
-        output = self.dense(x)
-        return output
+        # Multi-head self-attention
+        attention_out = self.attention(
+            query=x, value=x, key=x, training=training
+        )  # (batch, time, features)
+
+        # Optional: residual connection (can improve training stability)
+        x = x + attention_out
+
+        # GRU 2
+        x = self.gru_2(x, training=training)
+
+        x = self.rnn_norm(x)
+        return self.dense(x)
 
 
 class PrintDot(tf.keras.callbacks.Callback):
@@ -177,17 +193,18 @@ if __name__ == "__main__":
     print(X.shape)
     X = scaler.scale(X)
 
-    plt.plot(range(len(input_serie[0, :])), input_serie[0, :], "o-", label="real value")
-    plt.plot(
-        range(len(X[0, :]))[-n_steps * n_pred :],
-        X[0, :][-n_steps * n_pred :],
-        "-r",
-        label="prediction",
-    )
-    plt.xlabel("Time")
-    plt.ylabel("Value")
-    plt.legend()
-    plt.show()
+    for i in range(5):
+        plt.plot(range(len(input_serie[i, :])), input_serie[i, :], "o-", label="real value")
+        plt.plot(
+            range(len(X[i, :]))[-n_steps * n_pred :],
+            X[i, :][-n_steps * n_pred :],
+            "-r",
+            label="prediction",
+        )
+        plt.xlabel("Time")
+        plt.ylabel("Value")
+        plt.legend()
+        plt.show()
 
     # savel model
     model.save("./models/model_tensor", save_format="tf")
