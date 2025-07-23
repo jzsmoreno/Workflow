@@ -31,14 +31,17 @@ val = st.sidebar.radio("Inclinación", (False, True))
 n = st.sidebar.slider("Número total de series", 2, 200, 25, 1)
 i_serie = st.sidebar.slider("Serie a considerar", 0, n - 1, 0, 1)
 p_train = st.sidebar.slider("Proporción de entrenamiento", 0.2, 1.0, 0.7, 0.1)
+steps = st.sidebar.slider("Número de pasos del modelo", 1, 20, 16, 1)
 
 # Generación de los datos
-data_ = generate_series(n, n_steps=100, incline=val)
+n_steps = 100
+data_ = generate_series(n, n_steps=n_steps, incline=val)
 scaler = DataScaler(np.copy(data_))
 data_scale = scaler.rescale()
 series = convert_to_df(np.copy(data_)).describe()
-train, test = create_train_test_set(np.copy(data_scale), p_train=p_train)
-neural_network.fit(train[0], train[1])
+
+train, test = create_train_test_set(np.copy(data_scale), p_train=p_train, steps=steps)
+neural_network.fit(train[0][:, :, np.newaxis], train[1], verbose=0)
 
 # Sección de estadísticas descriptivas de los datos
 st.header("Estadísticas Descriptivas de los Datos")
@@ -55,7 +58,7 @@ st.plotly_chart(fig1)
 model = models[model_selector]
 st.header("Predicción del Modelo")
 st.write("La siguiente es la predicción generada por el modelo para la serie seleccionada:")
-prediction = forecasting(model, train, data_.shape[1], scaler)
+prediction = forecasting(model, train[0][:, :, np.newaxis], data_.shape[1], scaler, steps=steps)
 
 fig2 = plot_series(convert_to_df(data_), prediction, i=i_serie)
 st.plotly_chart(fig2)
@@ -63,7 +66,7 @@ st.plotly_chart(fig2)
 # Error cuadrático medio (RMSE)
 st.header("Evaluación del Modelo")
 st.write("A continuación se muestra el error cuadrático medio de la predicción:")
-rmse = model.evaluate(train[0], train[1])[0]
+rmse = model.evaluate(train[0][:, :, np.newaxis], train[1])[0]
 st.write(f"Error Cuadrático Medio (RMSE): {round(rmse, 4)}")
 
 # Gráfico de la desviación

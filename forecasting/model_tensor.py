@@ -142,10 +142,10 @@ def make_predictions(model, input_model, n_steps):
 if __name__ == "__main__":
     num_series = 80
     series_size = 100
-    n_steps = 4  # For SimpleNetRNN use 4
+    n_steps = 16  # For SimpleNetRNN use 4
 
     input_serie = generate_series(num_series, series_size, incline=False)
-    y_new = input_serie[:, :-n_steps]
+    y_new = input_serie.copy()
     print(y_new.shape)
     scaler = DataScaler(y_new, n=None)
     y_new = scaler.rescale()
@@ -188,7 +188,7 @@ if __name__ == "__main__":
     plt.xlabel("Epoch")
     plt.ylabel("Loss")
     plt.show()
-    n_pred = 16
+    n_pred = 4
     X = make_predictions(model, x_train[:, :, np.newaxis], n_steps=n_pred)
     print(X.shape)
     X = scaler.scale(X)
