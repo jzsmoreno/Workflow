@@ -1,33 +1,40 @@
 import plotly.express as px
+import plotly.graph_objects as go
 
 
 def plot_series(df_series, data_pred, i=0):
     df_plot = df_series.copy()
     df_plot["prediction"] = data_pred[i, : len(df_plot)]
 
-    cols_a_melt = [i, "prediction"]
+    # Define los colores
+    color_map = {str(i): "blue", "prediction": "red"}
 
-    df_long = df_plot.reset_index().melt(
-        id_vars="index", var_name="Serie", value_name="Valor", value_vars=cols_a_melt
-    )
+    fig = go.Figure()
 
-    color_map = {str(i): "blue", "prediction": "red"}  # Real series color  # Prediction color
-
-    fig = px.line(
-        df_long,
-        x="index",
-        y="Valor",
-        color="Serie",
-        title=f"Serie real '{i}' vs Prediction",
-        color_discrete_map=color_map,
-    )
-    fig.for_each_trace(
-        lambda trace: (
-            trace.update(line=dict(width=3))
-            if trace.name == str(i)
-            else trace.update(line=dict(width=2, dash="dot"))
+    fig.add_trace(
+        go.Scatter(
+            x=df_plot.index,
+            y=df_plot["prediction"],
+            mode="lines",
+            name="prediction",
+            line=dict(width=2, dash="dashdot", color=color_map["prediction"]),
         )
     )
+
+    fig.add_trace(
+        go.Scatter(
+            x=df_plot.index,
+            y=df_plot[i],
+            mode="lines",
+            name=str(i),
+            line=dict(width=3, dash="solid", color=color_map[str(i)]),
+        )
+    )
+
+    fig.update_layout(
+        title=f"Serie real '{i}' vs Prediction", xaxis_title="Index", yaxis_title="Valor"
+    )
+
     return fig
 
 

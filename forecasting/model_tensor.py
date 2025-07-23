@@ -25,7 +25,10 @@ class SimpleNetRNN(tf.keras.models.Model):
             ]
         )
 
-    def call(self, x):
+    @tf.function(
+        input_signature=[tf.TensorSpec([None, None, 1], tf.float32), tf.TensorSpec([], tf.bool)]
+    )
+    def call(self, x, training=False):
         x = self.network(x)
         return x
 
@@ -98,6 +101,9 @@ class SimpleNetGRU(tf.keras.Model):
             kernel_regularizer=kernel_regularizer,
         )
 
+    @tf.function(
+        input_signature=[tf.TensorSpec([None, None, 1], tf.float32), tf.TensorSpec([], tf.bool)]
+    )
     def call(self, inputs, training=False):
         x = self.conv(inputs)
         x = self.batch_norm(x, training=training)

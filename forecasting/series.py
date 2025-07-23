@@ -45,12 +45,10 @@ def create_train_test_set(data_series, p_train=0.7, steps=4):
     return [x_train, y_train], [x_test, y_test]
 
 
-def forecasting(model, train, m, scaler, steps=4.0):
-    n = int(train.shape[1])
-    n_periods = int((m - n) / steps)
+def forecasting(model, train, m, scaler, steps=4):
     data_pred = np.copy(train)
 
-    for step_ahead in range(n_periods + 1):
+    for step_ahead in range(steps):
         y_pred_one = model.predict(data_pred[:, step_ahead:], verbose=0)
         data_pred = np.concatenate([data_pred, y_pred_one[:, :, np.newaxis]], axis=1)
     series_pred = scaler.scale(np.copy(data_pred[:, :, 0]))
