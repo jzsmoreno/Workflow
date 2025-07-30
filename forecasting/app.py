@@ -33,6 +33,7 @@ i_serie = st.sidebar.slider("Serie a considerar", 0, n - 1, 0, 1)
 steps = st.sidebar.slider("Número de pasos del modelo", 2, n_steps - 2, 16, 2)
 val_train = st.sidebar.radio("Re-entrenamiento", (False, True))
 p_train = st.sidebar.slider("Proporción de entrenamiento", 0.2, 1.0, 0.7, 0.1)
+epochs = st.sidebar.slider("Épocas de entrenamiento", 2, 100, 10, 2)
 
 # Generación de los datos
 data_ = generate_series(n, n_steps=n_steps, incline=val)
@@ -42,7 +43,8 @@ series = convert_to_df(np.copy(data_)).describe()
 
 train, test = create_train_test_set(np.copy(data_scale), p_train=p_train, steps=steps)
 if val_train:
-    neural_network.fit(train[0][:, :, np.newaxis], train[1], verbose=0)
+    neural_network.fit(train[0][:, :, np.newaxis], train[1], epochs=epochs, verbose=0)
+    models = {"Neural Network": neural_network}
 
 # Sección de estadísticas descriptivas de los datos
 st.header("Estadísticas Descriptivas de los Datos")
