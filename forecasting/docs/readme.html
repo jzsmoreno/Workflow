@@ -1,0 +1,156 @@
+<html><head>
+<link rel="stylesheet" type="text/css" href="https://mdeditor.net/vditor/dist/index.css"/>
+<script src="https://mdeditor.net/vditor/dist/js/i18n/zh_CN.js"></script>
+<script src="https://mdeditor.net/vditor/dist/method.min.js"></script></head>
+<body><div class="vditor-reset" id="preview"><h2>¿Qué son las Redes Neuronales Recurrentes (RNN)?</h2>
+<p>Las <strong>Redes Neuronales Recurrentes</strong> son un tipo de arquitectura de redes neuronales diseñada específicamente para trabajar con <strong>secuencias de datos</strong>, como:</p>
+<ul>
+<li>Texto</li>
+<li>Series temporales</li>
+<li>Señales de audio o video</li>
+</ul>
+<p>A diferencia de las redes convolucionales (CNN) y las redes feedforward, las RNN tienen un mecanismo de <em>memoria</em> que les permite recordar información procesada en pasos anteriores. Es decir, <strong>el estado interno</strong> de la red se mantiene entre los elementos de la secuencia.</p>
+<h2>Arquitectura básica de una RNN simple</h2>
+<p>La <strong>RNN simple</strong> funciona con la idea de un bucle temporal: el output en cada paso se convierte en parte del input para el siguiente paso. Su estructura es:</p>
+<div class="language-math">h_t = f(W_{hh} h_{t-1} + W_{xh} x_t + b_h)</div>
+<p>Donde:</p>
+<ul>
+<li><span class="language-math">h_t</span>: estado oculto en el tiempo <span class="language-math">t</span></li>
+<li><span class="language-math">x_t</span>: entrada en el tiempo <span class="language-math">t</span></li>
+<li><span class="language-math">f</span>: función de activación (ej. <span class="language-math">\tanh</span> o ReLU)</li>
+</ul>
+<h3>Ejemplo visual:</h3>
+<p>Matemáticamente, supóngase que se tienen <span class="language-math">h</span> unidades ocultas, tamaño de batch <span class="language-math">n</span>, y el número de entradas es <span class="language-math">d</span>. Entonces, la entrada es <span class="language-math">x_{t} \in \mathbb{R}^{d\times n}</span> y el estado oculto del paso anterior es <span class="language-math">h_{t-1} \in \mathbb{R}^{h\times n}</span>.</p>
+<div class="language-math">x_{t} = \left(\begin{matrix}
+x^{1,1}_{t} &amp; \cdots &amp; x^{1,n}_{t} \\
+\vdots &amp; \ddots &amp; \vdots \\
+x^{d,1}_{t} &amp; \cdots &amp; x^{d,n}_{t}
+\end{matrix}\right)</div>
+<p>donde <span class="language-math">W_{hh} \in \mathbb{R}^{h\times h}</span>, <span class="language-math">W_{xh} \in \mathbb{R}^{h\times d}</span> y <span class="language-math">b_h \in \mathbb{R}^{h\times 1}</span>, y el estado oculto al tiempo <span class="language-math">t</span> para <span class="language-math">d = 1</span> (caso de series temporales univariable) es calculado como le sigue:</p>
+<div class="language-math">h_{t} =
+f\left(
+\left(\begin{matrix}
+w^{1,1}_{hh} &amp; \cdots &amp; w^{1,h}_{hh} \\
+\vdots &amp; \ddots &amp; \vdots \\
+w^{h,1}_{hh} &amp; \cdots &amp; w^{h,h}_{hh}
+\end{matrix}\right)
+\left(\begin{matrix}
+h^{1,1}_{t-1} &amp; \cdots &amp; h^{1,n}_{t-1} \\
+\vdots &amp; \ddots &amp; \vdots \\
+h^{h,1}_{t-1} &amp; \cdots &amp; h^{h,n}_{t-1}
+\end{matrix}\right)
++
+\left(\begin{matrix}
+w^{1,1}_{xh} x^{1,1}_{t} &amp; \cdots &amp; w^{1,1}_{xh} x^{1,n}_{t} \\
+\vdots &amp; \ddots &amp; \vdots \\
+w^{h,1}_{xh} x^{1,1}_{t} &amp; \cdots &amp; w^{h,1}_{xh} x^{1,n}_{t}
+\end{matrix}\right)
++
+\left(\begin{matrix}
+b^{1}_{h} \\
+\vdots \\
+b^{h}_{h}
+\end{matrix}\right)
+\right)</div>
+<h2>Limitaciones de las RNN simples</h2>
+<ul>
+<li><strong>Problema de gradientes desaparecientes/estallantes</strong>: No pueden manejar bien dependencias a largo plazo (ej. en un texto, no &quot;recuerdan&quot; lo que sucedió muchas palabras atrás).</li>
+</ul>
+<h2>LSTM: Long Short-Term Memory</h2>
+<p>La <strong>LSTM</strong> es una versión mejorada de la RNN simple. Introduce mecanismos para controlar qué información se retiene y cuál se olvida.</p>
+<h3>Componentes principales:</h3>
+<ul>
+<li><strong>Puerta de olvido (Forget Gate)</strong> → Decide qué información del estado previo debe desecharse.</li>
+<li><strong>Puerta de entrada (Input Gate)</strong> → Decide nuevas celdas a almacenar en la memoria.</li>
+<li><strong>Celda de memoria (Cell State)</strong> → Mantiene información por un largo tiempo.</li>
+<li><strong>Puerta de salida (Output Gate)</strong> → Calcula el output basado en la celda actual.</li>
+</ul>
+<h3>⚙️ Ecuaciones resumidas:</h3>
+<ol>
+<li><span class="language-math">f_t = \sigma(W_f [h_{t-1}, x_t] + b_f)</span></li>
+<li><span class="language-math">i_t = \sigma(W_i [h_{t-1}, x_t] + b_i)</span></li>
+<li><span class="language-math">\tilde{C}_{t} = \tanh(W_C [h_{t-1}, x_t] + b_C)</span></li>
+<li><span class="language-math">C_t = f_t * C_{t-1} + i_t * \tilde{C}_t</span></li>
+<li><span class="language-math">o_t = \sigma(W_o [h_{t-1}, x_t] + b_o)</span></li>
+<li><span class="language-math">h_t = o_t * \tanh(C_t)</span></li>
+</ol>
+<p>Donde <span class="language-math">\sigma</span> es la función sigmoide, y <span class="language-math">*</span> es multiplicación elemento a elemento.</p>
+<h3>Ventajas:</h3>
+<ul>
+<li>Maneja dependencias largas.</li>
+<li>Es más estable numéricamente que las RNN simples.</li>
+</ul>
+<hr />
+<h2>GRU: Gated Recurrent Unit</h2>
+<p>La <strong>GRU</strong> también resuelve el problema de los gradientes, pero con una estructura ligeramente más sencilla que la LSTM. Combina las <strong>puertas de olvido y entrada en una sola puerta (z)</strong>, además de fusionar el estado oculto y la celda.</p>
+<h3>🔧 Componentes principales:</h3>
+<ul>
+<li><strong>Puerta de actualización (Update Gate):</strong> Decide qué información actualizar.</li>
+<li><strong>Puerta de restablecimiento (Reset Gate):</strong> Controla cuánto del pasado afectará a la nueva entrada.</li>
+</ul>
+<h3>📘 Ecuaciones resumidas:</h3>
+<ol>
+<li><span class="language-math">z_t = \sigma(W_z [h_{t-1}, x_t] + b_z)</span></li>
+<li><span class="language-math">r_t = \sigma(W_r [h_{t-1}, x_t] + b_r)</span></li>
+<li><span class="language-math">\tilde{h}_{t}= \tanh(W_h [r_t * h_{t-1}, x_t] + b_h)</span></li>
+<li><span class="language-math">h_t = (1 - z_t) * h_{t-1} + z_t * \tilde{h}_t</span></li>
+</ol>
+<h3>Ventajas:</h3>
+<ul>
+<li>Más ligera que la LSTM.</li>
+<li>Menos parámetros → entrenamiento más rápido en algunos casos.</li>
+</ul>
+<hr />
+<h2>Comparación rápida</h2>
+<table>
+<thead>
+<tr>
+<th>Modelo</th>
+<th>Memoria a largo plazo</th>
+<th>Capacidad de modelado</th>
+<th>Velocidad / Tamaño</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>RNN</strong></td>
+<td>❌ Limitada</td>
+<td>Baja</td>
+<td>⚡ Rápida pero inestable</td>
+</tr>
+<tr>
+<td><strong>LSTM</strong></td>
+<td>✅ Alta</td>
+<td>Alta</td>
+<td>🐢 Más lenta, más precisa</td>
+</tr>
+<tr>
+<td><strong>GRU</strong></td>
+<td>✅ Media a alta</td>
+<td>Media-Alta</td>
+<td>⚡⚡ Un poco más rápida que LSTM</td>
+</tr>
+</tbody>
+</table>
+</div>
+<script>
+    const previewElement = document.getElementById('preview')
+    Vditor.setContentTheme('light', 'https://mdeditor.net/vditor/dist/css/content-theme');
+    Vditor.codeRender(previewElement);
+    Vditor.highlightRender({"enable":true,"lineNumber":false,"defaultLang":"","style":"github"}, previewElement, 'https://mdeditor.net/vditor');
+    Vditor.mathRender(previewElement, {
+        cdn: 'https://mdeditor.net/vditor',
+        math: {"engine":"KaTeX","inlineDigit":false,"macros":{}},
+    });
+    Vditor.mermaidRender(previewElement, 'https://mdeditor.net/vditor', 'classic');
+    Vditor.SMILESRender(previewElement, 'https://mdeditor.net/vditor', 'classic');
+    Vditor.markmapRender(previewElement, 'https://mdeditor.net/vditor');
+    Vditor.flowchartRender(previewElement, 'https://mdeditor.net/vditor');
+    Vditor.graphvizRender(previewElement, 'https://mdeditor.net/vditor');
+    Vditor.chartRender(previewElement, 'https://mdeditor.net/vditor', 'classic');
+    Vditor.mindmapRender(previewElement, 'https://mdeditor.net/vditor', 'classic');
+    Vditor.abcRender(previewElement, 'https://mdeditor.net/vditor');
+    Vditor.mediaRender(previewElement);
+    Vditor.speechRender(previewElement);
+</script>
+<script src="https://mdeditor.net/vditor/dist/js/icons/ant.js"></script></body></html>
