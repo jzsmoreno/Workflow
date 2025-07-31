@@ -33,6 +33,7 @@ class SimpleNetRNN(tf.keras.models.Model):
         return x
 
 
+@tf.keras.utils.register_keras_serializable(package="Custom", name="SimpleNetGRU")
 class SimpleNetGRU(tf.keras.Model):
     def __init__(
         self,
@@ -184,6 +185,10 @@ if __name__ == "__main__":
         callbacks=[PrintDot(), early_stopping, reduce_lr],
     )
 
+    # savel model
+    model.save("./model_tensor.keras")
+    model = tf.keras.models.load_model("model_tensor.keras")
+
     hist = pd.DataFrame(history.history)
     hist["epoch"] = history.epoch
     hist.tail()
@@ -211,6 +216,3 @@ if __name__ == "__main__":
         plt.ylabel("Value")
         plt.legend()
         plt.show()
-
-    # savel model
-    model.save("./models/model_tensor", save_format="tf")
