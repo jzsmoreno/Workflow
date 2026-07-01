@@ -1,4 +1,4 @@
 pandas
-streamlit==1.39.0
+streamlit==1.54.0
 numpy<2.0.0
 numba==0.58.1
