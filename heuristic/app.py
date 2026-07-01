@@ -1,17 +1,15 @@
 import numpy as np
 import pandas as pd
 import streamlit as st
-from figure import plotly_figure_1  # Función para la visualización
-from grasp import grasp  # Función para el algoritmo GRASP
+from figure import plotly_figure_1
+from grasp import grasp
 from numpy import loadtxt
 from tools import recombine_and_split
 
-# Carga de los datos
 data = pd.read_csv("heuristic/ubicaciones.csv")
-pattern = "heuristic/evalu.txt_part_*"  # Ajustar a tus nombres de archivo
+pattern = "heuristic/evalu.txt_part_*"
 evalu = recombine_and_split(pattern)
 
-# Sección de introducción
 st.title("Optimización de Territorios Usando Heurística GRASP")
 st.markdown(
     """
@@ -23,16 +21,14 @@ st.markdown(
     """
 )
 
-# Sección de carga de datos
 st.header("1. Datos de Entrada")
 st.write(
     """
     A continuación se muestran los datos utilizados para la ejecución del modelo. Estos incluyen las ubicaciones de los clientes, sus características y los parámetros relevantes para la asignación de territorios.
     """
 )
-st.dataframe(data.head())  # Mostrar las primeras filas de los datos
+st.dataframe(data.head())
 
-# Barra lateral para configuración de parámetros
 st.sidebar.header("2. Configuración de Parámetros")
 st.sidebar.write(
     """
@@ -40,7 +36,6 @@ st.sidebar.write(
     """
 )
 
-# Selección del número de días de entrega
 n_days = st.sidebar.slider(
     "Número de Días de Entrega",
     min_value=3,
@@ -50,7 +45,6 @@ n_days = st.sidebar.slider(
     help="Número de días en los que se deben realizar las entregas. Ajusta este valor según tu necesidad.",
 )
 
-# Parámetros de configuración para el algoritmo GRASP
 st.sidebar.subheader("Parámetros de GRASP")
 
 threshold_1 = st.sidebar.slider(
@@ -70,7 +64,7 @@ threshold_2 = st.sidebar.slider(
     step=0.1,
     help="Valor de umbral para el segundo criterio de selección en GRASP.",
 )
-# Ejecución del algoritmo GRASP para obtener la asignación de clientes
+
 st.sidebar.markdown("### Ejecución del Algoritmo")
 with st.spinner("Ejecutando el algoritmo GRASP..."):
     asig = grasp(
@@ -79,10 +73,9 @@ with st.spinner("Ejecutando el algoritmo GRASP..."):
         n_days,
         threshold_1=threshold_1,
         threshold_2=threshold_2,
-    )  # Llamada a la función GRASP con los parámetros configurados
-st.sidebar.success("¡Cálculo completado!")  # Mostrar mensaje al finalizar
+    )
+st.sidebar.success("¡Cálculo completado!")
 
-# Sección de resultados
 st.header("3. Resultados")
 st.write(
     """
@@ -90,11 +83,9 @@ st.write(
     """
 )
 
-# Visualización con Plotly
 fig = plotly_figure_1(data, asig)
-st.plotly_chart(fig)  # Mostrar el gráfico interactivo
+st.plotly_chart(fig)
 
-# Información adicional sobre los resultados
 st.write(
     """
     ### Interpretación de los Resultados
@@ -106,18 +97,14 @@ st.write(
     """
 )
 
-# Mostrar la asignación de territorios en formato tabla
 st.subheader("Asignación de Clientes a Territorios")
 st.write(
     """
     La siguiente tabla muestra cómo se han asignado los clientes a sus respectivos territorios para cada día de entrega.
     """
 )
-# Aquí puedes mostrar la asignación de clientes con el resultado final
-# Si 'asig' es un DataFrame, puedes mostrarlo directamente, sino procesarlo según sea necesario
-st.dataframe(asig)  # Mostrar las asignaciones
+st.dataframe(asig)
 
-# Añadir una sección de conclusión
 st.header("4. Conclusión")
 st.write(
     """

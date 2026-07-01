@@ -1,10 +1,11 @@
 import random
+from typing import List, Union
 
 import numpy as np
 import pandas as pd
 from numba import jit, njit, prange
 
-# Definir constantes como parámetros al inicio
+# Definir constante como parámetros al inicio
 THRESHOLD_1 = 0.7  # Umbral para distancia (70%)
 THRESHOLD_2 = 0.9  # Umbral para distancia (90%)
 VOLUME_FACTOR = 1.1  # Factor de volumen límite (110%)
@@ -13,7 +14,39 @@ CLIENT_LIMIT_FACTOR = 1.1  # Factor de límite de clientes (110%)
 
 # Función para elegir centros de distribución
 @jit()
-def centros(X, evalu, n_days, threshold_1=THRESHOLD_1, threshold_2=THRESHOLD_2):
+def centros(
+    X: Union[List, np.ndarray],
+    evalu: List[List[float]],
+    n_days: int,
+    threshold_1: float = THRESHOLD_1,
+    threshold_2: float = THRESHOLD_2,
+) -> List[int]:
+    """Select distribution centers for the GRASP construction phase.
+
+    This function builds a list of center customer IDs by randomly choosing an initial
+    customer with frequency equal to 1, then iteratively selecting subsequent centers
+    based on distance thresholds.
+
+    Parameters
+    ----------
+    X : `list` or `numpy.ndarray`
+        Customer array-like structure where each element contains at least:
+        `[Id_Cliente, Frecuencia, Vol_Entrega, lat, lon]`.
+    evalu : `list`
+        Distance/cost matrix where `evalu[i]` contains distances from center `i` to
+        all candidates.
+    n_days : `int`
+        Number of delivery days (number of centers to select).
+    threshold_1 : `float`, optional
+        Threshold multiplier used to choose the second center.
+    threshold_2 : `float`, optional
+        Threshold multiplier used for subsequent centers.
+
+    Returns
+    -------
+    list
+        List of selected center IDs (1-based IDs as stored in `X[...][0]`).
+    """
     C = []
     aux = random.choice(X)
 
@@ -47,17 +80,49 @@ def centros(X, evalu, n_days, threshold_1=THRESHOLD_1, threshold_2=THRESHOLD_2):
 
 # Función para asignar clientes a los centros de distribución
 def clientes(
-    C,
-    X,
-    asig,
-    frec,
-    data,
-    evalu,
-    n_days,
-    c1=10**9,
-    volume_limit_factor=VOLUME_FACTOR,
-    client_limit_factor=CLIENT_LIMIT_FACTOR,
-):
+    C: List[int],
+    X: Union[List, np.ndarray],
+    asig: List[List[int]],
+    frec: List[int],
+    data: pd.DataFrame,
+    evalu: List[List[float]],
+    n_days: int,
+    c1: float = 10**9,
+    volume_limit_factor: float = VOLUME_FACTOR,
+    client_limit_factor: float = CLIENT_LIMIT_FACTOR,
+) -> None:
+    """Assign customers to selected centers respecting frequency and capacity limits.
+
+    Parameters
+    ----------
+    C : `list`
+        Selected centers IDs (1-based, matching customer IDs in `X`).
+    X : `list` or `numpy.ndarray`
+        Customer array-like structure where each element contains at least:
+        `[Id_Cliente, Frecuencia, Vol_Entrega, lat, lon]`.
+    asig : `list`
+        Assignment matrix to be filled with 1s.
+        Shape: `[n_days][len(X)]`, where `asig[i][j] == 1` means customer `j` assigned to day `i`.
+    frec : `list`
+        Mutable remaining delivery frequency per customer index.
+    data : `pandas.DataFrame`
+        Source customer data; must include columns `Frecuencia` and `Vol_Entrega`.
+    evalu : `list`
+        Distance/cost matrix used for selecting the next customer for each center.
+    n_days : `int`
+        Number of delivery days/centers.
+    c1 : `float`, optional
+        Large penalty value used in the selection process.
+    volume_limit_factor : `float`, optional
+        Multiplier applied to the average per-day volume limit.
+    client_limit_factor : `float`, optional
+        Multiplier applied to the average per-day customer limit.
+
+    Returns
+    -------
+    None
+        The function updates `asig` and `frec` in-place.
+    """
     c2 = c1 * 10
     ntotal = len(X)
     climit = data.Frecuencia.sum() / n_days
@@ -124,14 +189,14 @@ def clientes(
 
 # Función principal del algoritmo GRASP
 def grasp(
-    data,
-    evalu,
-    n_days,
-    threshold_1=THRESHOLD_1,
-    threshold_2=THRESHOLD_2,
-    volume_limit_factor=VOLUME_FACTOR,
-    client_limit_factor=CLIENT_LIMIT_FACTOR,
-):
+    data: pd.DataFrame,
+    evalu: List[List[float]],
+    n_days: int,
+    threshold_1: float = THRESHOLD_1,
+    threshold_2: float = THRESHOLD_2,
+    volume_limit_factor: float = VOLUME_FACTOR,
+    client_limit_factor: float = CLIENT_LIMIT_FACTOR,
+) -> List[List[int]]:
     X = data[["Id_Cliente", "Frecuencia", "Vol_Entrega", "lat", "lon"]].to_numpy()
     ntotal = len(X)
     print("ntotal : ", ntotal)
