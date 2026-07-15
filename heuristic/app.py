@@ -11,30 +11,24 @@ pattern = "heuristic/evalu.txt_part_*"
 evalu = recombine_and_split(pattern)
 
 st.title("Optimización de Territorios Usando Heurística GRASP")
-st.markdown(
-    """
+st.markdown("""
     **Bienvenid@ a la optimización de territorios y rutas de entrega utilizando el algoritmo GRASP.**
 
     Este modelo tiene como objetivo asignar clientes a territorios específicos optimizando la ruta de entrega, teniendo en cuenta el número de días de entrega disponibles y otras variables importantes.
 
     GRASP (Greedy Randomized Adaptive Search Procedure) es un algoritmo heurístico de optimización que ofrece soluciones cercanas al óptimo en problemas complejos como la asignación de territorios.
-    """
-)
+    """)
 
 st.header("1. Datos de Entrada")
-st.write(
-    """
+st.write("""
     A continuación se muestran los datos utilizados para la ejecución del modelo. Estos incluyen las ubicaciones de los clientes, sus características y los parámetros relevantes para la asignación de territorios.
-    """
-)
+    """)
 st.dataframe(data.head())
 
 st.sidebar.header("2. Configuración de Parámetros")
-st.sidebar.write(
-    """
+st.sidebar.write("""
     Ajusta los parámetros del modelo para personalizar la asignación de territorios y rutas de entrega.
-    """
-)
+    """)
 
 n_days = st.sidebar.slider(
     "Número de Días de Entrega",
@@ -77,39 +71,31 @@ with st.spinner("Ejecutando el algoritmo GRASP..."):
 st.sidebar.success("¡Cálculo completado!")
 
 st.header("3. Resultados")
-st.write(
-    """
+st.write("""
     Ahora que el modelo ha ejecutado el algoritmo GRASP, podemos ver cómo se han asignado los clientes a los territorios y qué rutas de entrega se sugieren. El siguiente gráfico interactivo muestra los resultados en un mapa, donde cada color representa un día de entrega.
-    """
-)
+    """)
 
 fig = plotly_figure_1(data, asig)
 st.plotly_chart(fig)
 
-st.write(
-    """
+st.write("""
     ### Interpretación de los Resultados
 
     En el gráfico interactivo anterior, cada grupo de puntos representa un territorio asignado a un día de entrega específico. Puedes hacer zoom, mover y explorar los diferentes territorios asignados.
 
     - **Días de entrega:** Los colores en el mapa representan diferentes días de entrega.
     - **Clientes asignados:** Los clientes en cada territorio están agrupados para una entrega eficiente dentro del marco de días establecidos.
-    """
-)
+    """)
 
 st.subheader("Asignación de Clientes a Territorios")
-st.write(
-    """
+st.write("""
     La siguiente tabla muestra cómo se han asignado los clientes a sus respectivos territorios para cada día de entrega.
-    """
-)
+    """)
 st.dataframe(asig)
 
 st.header("4. Conclusión")
-st.write(
-    """
+st.write("""
     El algoritmo GRASP ha permitido obtener una solución eficiente para la asignación de territorios y rutas de entrega. Dependiendo de los parámetros establecidos (número de días de entrega, umbrales y factores), el modelo puede ofrecer diferentes configuraciones para adaptarse a las necesidades de tu problema.
 
     ¡Esperamos que esta herramienta te sea útil para la optimización de tus operaciones logísticas!
-    """
-)
+    """)

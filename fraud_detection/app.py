@@ -16,8 +16,7 @@ st.set_page_config(page_title="Detección de Fraudes", layout="wide")
 
 # Sección de introducción
 st.title("Predicción de Fraudes usando Mapas Auto-Organizados")
-st.markdown(
-    """
+st.markdown("""
     **Bienvenid@ a la herramienta de detección de fraudes.**
     
     Esta aplicación utiliza Mapas Auto-Organizados (SOM) para predecir posibles fraudes en el conjunto de datos de aprobación de crédito. 
@@ -25,8 +24,7 @@ st.markdown(
     
     #### Dataset utilizado:
     - [UCI Credit Approval Dataset](https://archive.ics.uci.edu/ml/datasets/credit+approval)
-    """
-)
+    """)
 
 # Panel lateral para selección de modelo y parámetros
 st.sidebar.markdown("## Configuración del Modelo")
@@ -100,13 +98,11 @@ with col2:
     # Agregar otras métricas o análisis adicionales
 
 # Opcional: Agregar una sección final con explicaciones
-st.markdown(
-    """
+st.markdown("""
     ## ¿Cómo Funciona el Modelo?
     
     El modelo utiliza Mapas Auto-Organizados (SOM) para agrupar datos similares y detectar anomalías que podrían indicar fraudes.
     Estos modelos son útiles para análisis no supervisados donde no se dispone de etiquetas claras sobre los fraudes.
     
     **Nota**: La precisión depende de los parámetros utilizados en el SOM. Ajusta la *Distancia Interneuronal* para observar cambios en el resultado.
-    """
-)
+    """)

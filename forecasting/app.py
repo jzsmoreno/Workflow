@@ -14,13 +14,11 @@ models = {"Neural Network": neural_network}
 
 # Sección de introducción
 st.title("Predicción de Series Temporales usando Redes Neuronales")
-st.write(
-    """
+st.write("""
     Bienvenid@ a este sencillo ejemplo que ejecuta un modelo entrenado 
     de IA usando redes neuronales recurrentes para predecir series de tiempo. 
     El modelo ha sido entrenado para hacer pronósticos precisos, basándose en datos históricos.
-    """
-)
+    """)
 
 # Selector de modelo en el sidebar
 model_selector = st.sidebar.selectbox("Selecciona el modelo a utilizar:", list(models.keys()))
